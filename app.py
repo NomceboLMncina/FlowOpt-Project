@@ -48,6 +48,32 @@ def get_tasks():
     print("Current workflows:", workflows)  # Debugging line
     return jsonify(workflows)
 
+# API to delete a task
+@app.route('/delete_task', methods=['POST'])
+def delete_task():
+    data = request.json
+    task_name = data.get('name')  # Use task name as a unique identifier
+    workflows = load_workflows()
+    
+    # Remove the task with the matching name
+    workflows = [task for task in workflows if task['name'] != task_name]
+    save_workflows(workflows)
+    
+    return jsonify({"message": "Task deleted successfully!"})
+
+# API to clear all tasks
+@app.route('/clear_tasks', methods=['POST'])
+def clear_tasks():
+    save_workflows([])  # Save an empty list to workflows.json
+    return jsonify({"message": "All tasks cleared successfully!"})
+
+# API to import tasks
+@app.route('/import_tasks', methods=['POST'])
+def import_tasks():
+    tasks = request.json
+    save_workflows(tasks)  # Save the imported tasks to workflows.json
+    return jsonify({"message": "Tasks imported successfully!"})
+
 @app.route('/settings')
 def settings():
     return render_template('settings.html')
