@@ -1,55 +1,13 @@
-// Apply gradient background
-function applyGradientBackground() {
-    const color1 = document.getElementById('bgColorPicker1').value;
-    const color2 = document.getElementById('bgColorPicker2').value;
-    document.body.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
-    localStorage.setItem('gradientBackground', JSON.stringify({ color1, color2 })); // Save to localStorage
-}
-
-// Load saved gradient background
-function loadGradientBackground() {
-    const savedGradient = localStorage.getItem('gradientBackground');
-    if (savedGradient) {
-        const { color1, color2 } = JSON.parse(savedGradient);
-        document.body.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
-    }
-}
-
-// Apply dark/light mode
-function applyTheme() {
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle.checked) {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Load saved theme
-function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const themeToggle = document.getElementById('themeToggle');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        themeToggle.checked = true;
-    } else {
-        document.body.classList.remove('dark-mode');
-        themeToggle.checked = false;
-    }
-}
-
-// Export workflow as CSV
-function exportWorkflow(format) {
-    fetch('/get_tasks')
-        .then(response => response.json())
-        .then(data => {
-            if (format === 'csv') {
-                exportAsCSV(data);
-            }
-        })
-        .catch(error => console.error("Error exporting workflow:", error));
+// Export as JSON
+function exportAsJSON(tasks) {
+    const jsonContent = JSON.stringify(tasks, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "workflow.json");
+    document.body.appendChild(link);
+    link.click();
 }
 
 // Export as CSV
@@ -64,11 +22,66 @@ function exportAsCSV(tasks) {
     link.click();
 }
 
-// Add event listener to the theme toggle
-document.getElementById('themeToggle').addEventListener('change', applyTheme);
+// Export workflow
+function exportWorkflow(format) {
+    fetch('/get_tasks')
+        .then(response => response.json())
+        .then(data => {
+            if (format === 'json') {
+                exportAsJSON(data);
+            } else if (format === 'csv') {
+                exportAsCSV(data);
+            }
+        })
+        .catch(error => console.error("Error exporting workflow:", error));
+}
+
+// Import workflow from JSON
+function importWorkflow() {
+    const fileInput = document.getElementById('importFile');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a JSON file to import.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const tasks = JSON.parse(e.target.result);
+        fetch('/import_tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(tasks)
+        })
+        .then(response => response.json())
+        .then(() => {
+            alert("Workflow imported successfully!");
+            window.location.href = '/'; // Redirect to home page
+        })
+        .catch(error => console.error("Error importing workflow:", error));
+    };
+    reader.readAsText(file);
+}
+
+// Load notification preference
+function loadNotificationPreference() {
+    const notificationToggle = document.getElementById('notificationToggle');
+    const notificationEnabled = localStorage.getItem('notificationEnabled') === 'true';
+    notificationToggle.checked = notificationEnabled;
+}
+
+// Save notification preference
+function saveNotificationPreference() {
+    const notificationToggle = document.getElementById('notificationToggle');
+    localStorage.setItem('notificationEnabled', notificationToggle.checked);
+}
+
+// Add event listener to the notification toggle
+document.getElementById('notificationToggle').addEventListener('change', saveNotificationPreference);
 
 // Call these functions on page load
 document.addEventListener('DOMContentLoaded', function () {
-    loadGradientBackground();
-    loadTheme();
+    loadNotificationPreference();
 });
