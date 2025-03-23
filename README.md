@@ -1,166 +1,243 @@
-# **FlowOpt Documentation**
+## **FlowOpt Documentation**
 
-## **Table of Contents**
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Technologies Used](#technologies-used)
-4. [Setup Instructions](#setup-instructions)
-5. [Usage](#usage)
-6. [Customization](#customization)
-7. [Troubleshooting](#troubleshooting)
-8. [Future Enhancements](#future-enhancements)
+### **Overview**
+FlowOpt is a web application designed to help users manage and optimize their workflows. It allows users to:
+- Add tasks with details like name, time, dependencies, assignee, start time, and end time.
+- Visualize tasks using a bar chart.
+- Delete individual tasks or clear all tasks.
+- Export and import workflows as JSON files.
+- Enable or disable task reminders.
 
----
 
-## **1. Introduction**
-**FlowOpt** is a web-based workflow optimization app designed to help users analyze and optimize their daily workflows or processes. It allows users to input tasks, estimate time requirements, visualize workflows, and identify bottlenecks or inefficiencies. The app is built using **HTML**, **CSS**, **JavaScript**, and **Python Flask**, with **Chart.js** for data visualization.
+### **File Structure**
+The app consists of the following files:
 
----
+1. **`app.py`**:
+   - The main Flask application file.
+   - Handles routing, task management, and JSON file operations.
 
-## **2. Features**
-- **Task Management**:
-  - Add tasks with details like name, time, dependencies, assignee, start time, and end time.
-  - View tasks in a table.
-- **Workflow Visualization**:
-  - Visualize tasks and timelines using a bar chart.
-- **Background Customization**:
-  - Change the background color or set a gradient background.
-  - Upload a background image.
-- **Dark Mode**:
-  - Toggle between dark and light themes.
-- **Task Reminders**:
-  - Receive browser notifications 1 hour before a task is due.
-- **Export Workflow**:
-  - Export the workflow as a CSV file.
-- **Share Workflow**:
-  - Generate a shareable link for the workflow.
+2. **`index.html`**:
+   - The home page where users can add tasks, view the task list, and visualize workflows.
 
----
+3. **`settings.html`**:
+   - The settings page where users can export/import workflows and manage notification preferences.
 
-## **3. Technologies Used**
-- **Frontend**:
-  - HTML, CSS, JavaScript
-  - Bootstrap (for styling)
-  - Chart.js (for data visualization)
-  - Font Awesome (for icons)
-- **Backend**:
-  - Python Flask (for data processing)
-- **Database**:
-  - Local Storage (for saving tasks and settings)
-- **Hosting**:
-  - GitHub Pages or Heroku (for deployment)
+4. **`script.js`**:
+   - Handles frontend logic for the home page, including task management and chart updates.
 
----
+5. **`settings.js`**:
+   - Handles frontend logic for the settings page, including exporting/importing workflows and managing notifications.
 
-## **4. Setup Instructions**
+6. **`styles.css`**:
+   - Contains custom styles for the app.
 
-### **Prerequisites**
-- Python 3.x
-- Git
-- A code editor (e.g., VS Code)
+7. **`workflows.json`**:
+   - Stores the list of tasks in JSON format.
 
-### **Steps**
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/FlowOpt.git
-   cd FlowOpt
-   ```
 
-2. **Install Dependencies**:
-   Install Flask and other required packages:
+### **Features**
+
+#### **1. Add Task**
+- Users can add tasks using the form on the home page.
+- Each task includes:
+  - **Task Name**: Name of the task.
+  - **Time Required**: Estimated time to complete the task (in hours).
+  - **Dependencies**: Comma-separated list of dependent tasks.
+  - **Assignee**: Name of the team member assigned to the task.
+  - **Start Time**: Scheduled start time of the task.
+  - **End Time**: Scheduled end time of the task.
+
+#### **2. Task List**
+- Displays all tasks in a table.
+- Each task has a "Delete" button to remove it from the list.
+- A "Clear All Tasks" button removes all tasks from the list.
+
+#### **3. Workflow Visualization**
+- Displays a bar chart of tasks using Chart.js.
+- The x-axis represents task names, and the y-axis represents the time required.
+
+#### **4. Export Workflow**
+- Users can export the workflow as a JSON or CSV file from the settings page.
+
+#### **5. Import Workflow**
+- Users can import a workflow from a JSON file on the settings page.
+
+#### **6. Notification Preferences**
+- Users can enable or disable task reminders on the settings page.
+
+
+### **API Endpoints**
+
+#### **1. `GET /`**
+- Renders the home page (`index.html`).
+
+#### **2. `POST /add_task`**
+- Adds a new task to the workflow.
+- **Request Body**:
+  ```json
+  {
+    "name": "Task 1",
+    "time": 5,
+    "dependencies": ["Task 2"],
+    "assignee": "John",
+    "startTime": "2023-10-01T09:00",
+    "endTime": "2023-10-01T14:00"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "Task added successfully!"
+  }
+  ```
+
+#### **3. `GET /get_tasks`**
+- Returns the list of tasks.
+- **Response**:
+  ```json
+  [
+    {
+      "name": "Task 1",
+      "time": 5,
+      "dependencies": ["Task 2"],
+      "assignee": "John",
+      "startTime": "2023-10-01T09:00",
+      "endTime": "2023-10-01T14:00"
+    }
+  ]
+  ```
+
+#### **4. `POST /delete_task`**
+- Deletes a task by name.
+- **Request Body**:
+  ```json
+  {
+    "name": "Task 1"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "Task deleted successfully!"
+  }
+  ```
+
+#### **5. `POST /clear_tasks`**
+- Clears all tasks.
+- **Response**:
+  ```json
+  {
+    "message": "All tasks cleared successfully!"
+  }
+  ```
+
+#### **6. `POST /import_tasks`**
+- Imports tasks from a JSON file.
+- **Request Body**:
+  ```json
+  [
+    {
+      "name": "Task 1",
+      "time": 5,
+      "dependencies": ["Task 2"],
+      "assignee": "John",
+      "startTime": "2023-10-01T09:00",
+      "endTime": "2023-10-01T14:00"
+    }
+  ]
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "Tasks imported successfully!"
+  }
+  ```
+
+
+### **How to Use**
+
+#### **1. Running the App**
+1. Install the required dependencies:
    ```bash
    pip install flask
    ```
-
-3. **Run the App**:
-   Start the Flask server:
+2. Run the Flask app:
    ```bash
    python app.py
    ```
+3. Open your browser and navigate to `http://127.0.0.1:5000`.
 
-4. **Access the App**:
-   Open your browser and go to:
-   ```
-   http://127.0.0.1:5000
-   ```
+#### **2. Adding Tasks**
+1. Fill out the form on the home page.
+2. Click "Add Task" to add the task to the list.
 
----
+#### **3. Deleting Tasks**
+1. Click the "Delete" button next to a task to remove it.
 
-## **5. Usage**
+#### **4. Clearing All Tasks**
+1. Click the "Clear All Tasks" button to remove all tasks.
 
-### **Home Page**
-- **Add Task**:
-  - Fill out the form to add a new task.
-  - Click **Add Task** to save the task.
-- **Task List**:
-  - View all tasks in the table.
-- **Workflow Visualization**:
-  - See a bar chart of tasks and their time requirements.
+#### **5. Exporting Workflows**
+1. Go to the settings page.
+2. Click "Export as JSON" or "Export as CSV" to download the workflow.
 
-### **Settings Page**
-- **Background Customization**:
-  - Choose a gradient background or upload an image.
-- **Dark Mode**:
-  - Toggle between dark and light themes.
-- **Export Workflow**:
-  - Export the workflow as a CSV file.
-- **Share Workflow**:
-  - Generate a shareable link for the workflow.
+#### **6. Importing Workflows**
+1. Go to the settings page.
+2. Click "Choose File" to select a JSON file.
+3. Click "Import Workflow" to load the data.
+
+#### **7. Managing Notifications**
+1. Go to the settings page.
+2. Toggle the "Enable Task Reminders" switch to enable or disable reminders.
 
 ---
 
-## **6. Customization**
+### **Code Examples**
 
-### **Change Background**
-1. Go to the **Settings** page.
-2. Choose two colors for a gradient background or upload an image.
-3. Click **Apply Gradient** or **Apply Image**.
+#### **Adding a Task**
+```javascript
+fetch('/add_task', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        name: "Task 1",
+        time: 5,
+        dependencies: ["Task 2"],
+        assignee: "John",
+        startTime: "2023-10-01T09:00",
+        endTime: "2023-10-01T14:00"
+    })
+});
+```
 
-### **Enable Dark Mode**
-1. Go to the **Settings** page.
-2. Toggle the **Dark Mode** switch.
+#### **Deleting a Task**
+```javascript
+fetch('/delete_task', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: "Task 1" })
+});
+```
 
-### **Export Workflow**
-1. Go to the **Settings** page.
-2. Click **Export as CSV** to download the workflow.
+#### **Clearing All Tasks**
+```javascript
+fetch('/clear_tasks', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+```
 
-### **Task Reminders**
-- The app will automatically send a browser notification 1 hour before a task is due.
 
----
-
-## **7. Troubleshooting**
-
-### **Common Issues**
-1. **Tasks Not Saving**:
-   - Ensure the `data/workflows.json` file exists and is writable.
-   - Check the browser console for errors.
-
-2. **Chart Not Displaying**:
-   - Ensure `Chart.js` is loaded correctly.
-   - Verify that tasks have valid time values.
-
-3. **Dark Mode Not Working**:
-   - Ensure the `theme` key is saved in `localStorage`.
-   - Check the browser console for errors.
-
-### **Debugging Tips**
-- Use `console.log()` in JavaScript to debug issues.
-- Check the Flask server logs for backend errors.
-
----
-
-## **8. Future Enhancements**
-- **User Authentication**:
-  - Allow users to create accounts and save workflows.
-- **Real-Time Collaboration**:
-  - Enable multiple users to collaborate on the same workflow.
-- **Advanced Analytics**:
-  - Add machine learning for predictive analytics.
-- **Mobile App**:
-  - Develop a mobile version of the app using React Native.
-
----
-
-## **Conclusion**
-**FlowOpt** is a powerful yet simple tool for optimizing workflows. With its intuitive interface and robust features, it’s perfect for individuals and small teams looking to improve productivity. Feel free to customize and extend the app to suit your needs!
+### **Future Enhancements**
+1. **Task Editing**:
+   - Allow users to edit existing tasks.
+2. **User Authentication**:
+   - Add user accounts to save workflows privately.
+3. **Advanced Analytics**:
+   - Provide insights into task completion times and dependencies.
