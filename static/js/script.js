@@ -59,6 +59,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${task.assignee || 'Unassigned'}</td>
                 <td>${task.startTime || 'N/A'}</td>
                 <td>${task.endTime || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.name}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
             `;
             taskTableBody.appendChild(row);
         });
@@ -98,8 +103,42 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => console.error("Error adding task:", error));
     });
 
+    // Delete task
+    window.deleteTask = function (taskName) {
+        fetch('/delete_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: taskName })
+        })
+        .then(response => response.json())
+        .then(() => {
+            fetchTasks(); // Refresh the task list
+        })
+        .catch(error => console.error("Error deleting task:", error));
+    };
+
+    // Clear all tasks
+    document.getElementById('clearTasks').addEventListener('click', function () {
+        fetch('/clear_tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(() => {
+            fetchTasks(); // Refresh the task list
+        })
+        .catch(error => console.error("Error clearing tasks:", error));
+    });
+
     // Check for due tasks and send reminders
     function checkTaskReminders(tasks) {
+        const notificationEnabled = localStorage.getItem('notificationEnabled') === 'true';
+        if (!notificationEnabled) return;
+
         tasks.forEach(task => {
             if (task.endTime) {
                 const endTime = new Date(task.endTime);
